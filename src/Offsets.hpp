@@ -4,7 +4,8 @@
 
 inline uintptr_t get_cached_base()
 {
-    static uintptr_t cached_base = []() -> uintptr_t {
+    static uintptr_t cached_base = []() -> uintptr_t
+    {
         const uint32_t count = _dyld_image_count();
         for (uint32_t i = 0; i < count; ++i)
         {
@@ -23,15 +24,29 @@ namespace Offsets
 {
 constexpr uintptr_t PrintOffset = 0x1001AC52C;
 constexpr uintptr_t GetStateOffset = 0x100C7F61C;
+constexpr uintptr_t ScriptContextOffset = 0x528;
 
-inline uintptr_t Print() { return ASLR(PrintOffset); }
-inline uintptr_t GetState() { return ASLR(GetStateOffset); }
+inline uintptr_t Print()
+{
+    return ASLR(PrintOffset);
 }
 
-namespace Roblox {
-using printdef = int(*)(int, const char*, ...);
-using getstatedef = uintptr_t(*)(uintptr_t, int32_t*, uintptr_t*);
+inline uintptr_t GetState()
+{
+    return ASLR(GetStateOffset);
+}
+
+inline uintptr_t ScriptContext()
+{
+    return ASLR(ScriptContextOffset);
+}
+} // namespace Offsets
+
+namespace Roblox
+{
+using printdef = int (*)(int, const char*, ...);
+using getstatedef = uintptr_t (*)(uintptr_t, uint64_t*, uint64_t*);
 
 inline auto Print = reinterpret_cast<printdef>(Offsets::Print());
 inline auto GetState = reinterpret_cast<getstatedef>(Offsets::GetState());
-}
+} // namespace Roblox
